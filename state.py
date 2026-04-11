@@ -1,4 +1,5 @@
-from typing import TypedDict
+from typing import TypedDict, List
+from langchain_core.documents import Document
 
 
 class State(TypedDict):
@@ -7,3 +8,4 @@ class State(TypedDict):
     category: str
     answer: str
     retry_count: int
+    docs: List[Document]

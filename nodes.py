@@ -2,6 +2,7 @@ from state import State
 from langchain_core.prompts import ChatPromptTemplate
 from config.model import model
 from langchain_core.output_parsers import StrOutputParser
+from config.retriever import retriever, format_docs
 
 # Prompt for better adjusting the question
 rewrite_prompt = ChatPromptTemplate.from_messages([
@@ -45,7 +46,50 @@ def categorize_node(state: State) -> dict:
     category = cat_chain.invoke({
         "question": question
     })
+    if category not in ["refund", "technical"]:
+        category = "other"
 
     return {"category": category}
 
-    
+
+def get_category(state: State) -> dict:
+    category = state["category"]
+    return category
+
+
+def refund_node(state: State) -> dict:
+    return {"answer": "Refund approved for order #XYZ"}
+
+
+def other_node(state: State) -> dict:
+    return {"answer": "Please contact support@company.com"}
+
+
+def technical_node(state: State) -> dict:
+    question = state["rewritten_complaint"]
+    docs = retriever.invoke(question)
+    return {"docs": docs}
+
+
+answer_prompt = ChatPromptTemplate.from_messages([
+    ("system", """
+     Answer the question using ONLY context.
+
+     Try to get as much informations as possible.
+
+     Do NOT as questions.
+     """),
+    ("user", "Context:\n{context}\nQuestion:\n{question}")
+])
+
+answer_chain = answer_prompt | model | StrOutputParser()
+
+
+def answer_node(state: State) -> dict:
+    documents = format_docs(state["docs"])
+    question = state["rewritten_complaint"]
+    answer = answer_chain.invoke({
+        "context": documents,
+        "question": question
+    })
+    return {"answer": answer}

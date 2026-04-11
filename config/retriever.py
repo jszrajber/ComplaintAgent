@@ -1,4 +1,4 @@
-from embeddings import vectorstore
+from .embeddings import vectorstore
 from sentence_transformers import CrossEncoder
 
 # Retrieve data from vector database
