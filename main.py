@@ -3,7 +3,7 @@ from graph import app
 config = {"configurable": {"thread_id": 1}}  # Values for db to retrieve the same thread after pausing
 
 result = app.invoke({
-    "complaint": "Where is the love",
+    "complaint": "The app is not working again",
     "retry_count": 0
 }, config=config)
 
@@ -21,3 +21,5 @@ if "refund" in state.next:
         print("Refund rejected")
 else:
     print(result['answer'])
+
+# print(app.get_graph().draw_mermaid()) for mermaid.live visual graph

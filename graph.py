@@ -27,7 +27,12 @@ graph.set_entry_point("rewrite")
 graph.add_edge("rewrite", "categorize")
 graph.add_conditional_edges(
     "categorize",
-    get_category
+    get_category,
+    {
+        "refund": "refund",             # Explicit is better than implicit
+        "technical": "technical",
+        "other": "other"
+    }
 )
 graph.add_edge("refund", END)
 graph.add_edge("other", END)
