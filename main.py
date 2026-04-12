@@ -1,25 +1,44 @@
-from graph import app
+from fastapi import FastAPI
+from agent_components.graph import graph_app
+from schemas import ComplaintRequest, RefundDecision
+from uuid import uuid4
 
-config = {"configurable": {"thread_id": 1}}  # Values for db to retrieve the same thread after pausing
+app = FastAPI()
 
-result = app.invoke({
-    "complaint": "The app is not working again",
-    "retry_count": 0
-}, config=config)
 
-state = app.get_state(config)   # Checkpointer snapshot
+@app.get("/")
+def health_check():
+    return {"status": "ok"}
 
-if "refund" in state.next:
-    print("REFUND - PAUSED")
-    print("DO YOU WANT TO PROCEED WITH THE REFUND?")
-    decision = input("Type 'yes' or 'no: ").strip().lower()
 
-    if decision == "yes":
-        result = app.invoke(None, config=config)
-        print(result['answer'])
+@app.post("/complaint")
+async def get_solution(req: ComplaintRequest):
+    thread_id = str(uuid4())
+    config = {"configurable": {"thread_id": thread_id}}  # Cannot be global, otherwise all endpoints would share the same ID
+
+    result = graph_app.invoke({
+        "complaint": req.complaint,
+        "retry_count": 0
+    }, config=config)
+
+    state = graph_app.get_state(config)
+
+    if "refund" in state.next:
+        return {
+            "status": "pending_approval",
+            "thread_id": thread_id
+        }
+
     else:
-        print("Refund rejected")
-else:
-    print(result['answer'])
+        return {"answer": result["answer"]}
 
-# print(app.get_graph().draw_mermaid()) for mermaid.live visual graph
+
+@app.post("/refund/{thread_id}")
+async def handle_refund(thread_id: str, body: RefundDecision):
+    if body.decision == "approve":
+        config = {"configurable": {"thread_id": thread_id}}
+        result = graph_app.invoke(None, config=config)
+        return {"answer": result["answer"]}
+    else:
+        return {"answer": "Refund rejected"}
+

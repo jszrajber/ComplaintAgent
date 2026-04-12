@@ -1,8 +1,8 @@
-from state import State
+from .state import State
 from langchain_core.prompts import ChatPromptTemplate
-from config.model import model
+from .config.model import model
 from langchain_core.output_parsers import StrOutputParser
-from config.retriever import retriever, format_docs
+from .config.retriever import retriever, format_docs
 
 # Prompt for better adjusting the question
 rewrite_prompt = ChatPromptTemplate.from_messages([

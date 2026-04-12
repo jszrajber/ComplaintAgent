@@ -1,4 +1,4 @@
-from nodes import (
+from .nodes import (
     categorize_node,
     rewrite_node,
     get_category,
@@ -8,7 +8,7 @@ from nodes import (
     answer_node
 )
 from langgraph.graph import StateGraph, END
-from state import State
+from .state import State
 from langgraph.checkpoint.memory import MemorySaver
 
 # Initialize graph
@@ -43,7 +43,7 @@ graph.add_edge("answer", END)
 checkpointer = MemorySaver()
 
 # Compile the app
-app = graph.compile(
+graph_app = graph.compile(
     checkpointer=checkpointer,  # Save state to MemorySaver after every step
     interrupt_before=["refund"]    # Pause before node
 )

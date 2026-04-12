@@ -1,6 +1,6 @@
 from langchain_ollama import OllamaEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from data import text
+from ..data import text
 from langchain_core.documents import Document
 from langchain_community.vectorstores import FAISS
 
