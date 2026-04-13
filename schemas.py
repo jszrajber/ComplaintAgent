@@ -8,4 +8,3 @@ class ComplaintRequest(BaseModel):
 
 class RefundDecision(BaseModel):
     decision: Literal['approve', "reject"]
-    

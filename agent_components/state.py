@@ -9,3 +9,4 @@ class State(TypedDict):
     answer: str
     retry_count: int
     docs: List[Document]
+    completed: bool
